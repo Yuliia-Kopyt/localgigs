@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -61,20 +61,39 @@ def seed_data():
     cur.close()
     conn.close()
 
+from flask import request
+
+@app.route("/")
 @app.route("/")
 def home():
+    city = request.args.get("city")
+
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    cur.execute("SELECT * FROM concerts ORDER BY id;")
+    if city:
+        cur.execute(
+            "SELECT * FROM concerts WHERE city = %s ORDER BY id;",
+            (city,)
+        )
+    else:
+        cur.execute("SELECT * FROM concerts ORDER BY id;")
+
     concerts = cur.fetchall()
+
+    cur.execute("SELECT DISTINCT city FROM concerts ORDER BY city;")
+    cities = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return render_template("index.html", concerts=concerts)
-
-@app.route("/items/<int:concert_id>")
+    return render_template(
+        "index.html",
+        concerts=concerts,
+        cities=cities,
+        selected_city=city
+    )
+    
 def concert_details(concert_id):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)

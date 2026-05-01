@@ -8,6 +8,23 @@
 
 <h1>🎶 LocalGigs</h1>
 
+<form method="get" action="/">
+    <label for="city">Фільтр за містом:</label>
+
+    <select name="city" id="city">
+        <option value="">Усі міста</option>
+
+        {% for city in cities %}
+            <option value="{{ city.city }}" {% if selected_city == city.city %}selected{% endif %}>
+                {{ city.city }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Показати</button>
+    <a href="/">Скинути</a>
+</form>
+
 {% for concert in concerts %}
 <div style="border:1px solid gray; padding:10px; margin:10px;">
     <h2>{{ concert.title }}</h2>
