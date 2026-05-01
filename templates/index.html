@@ -5,7 +5,17 @@
     <title>LocalGigs</title>
 </head>
 <body>
-    <h1>🎶 LocalGigs працює!</h1>
-    <p>Моя афіша локальних концертів запустилась.</p>
+
+<h1>🎶 LocalGigs</h1>
+
+{% for concert in concerts %}
+<div style="border:1px solid gray; padding:10px; margin:10px;">
+    <h2>{{ concert.title }}</h2>
+    <p>{{ concert.city }} • {{ concert.genre }} • {{ concert.price }}</p>
+    <p>{{ concert.description }}</p>
+    <a href="/items/{{ concert.id }}">Детальніше</a>
+</div>
+{% endfor %}
+
 </body>
 </html>
