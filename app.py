@@ -1,98 +1,89 @@
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template
 
 app = Flask(__name__)
 
-concerts = [
-    {
-        "id": 1,
-        "title": "Jazz Night",
-        "city": "Dnipro",
-        "genre": "Jazz",
-        "price": "$10",
-        "description": "Живий джаз у центрі міста"
-    },
-    {
-        "id": 2,
-        "title": "Rock Evening",
-        "city": "Kyiv",
-        "genre": "Rock",
-        "price": "$15",
-        "description": "Локальні рок-гурти"
-    },
-    {
-        "id": 3,
-        "title": "Indie Vibes",
-        "city": "Lviv",
-        "genre": "Indie",
-        "price": "$12",
-        "description": "Атмосферний інді-концерт"
-    },
-    {
-        "id": 4,
-        "title": "Hip-Hop Night",
-        "city": "Kharkiv",
-        "genre": "Hip-Hop",
-        "price": "$8",
-        "description": "Батли та лайв виступи"
-    },
-    {
-        "id": 5,
-        "title": "Acoustic Evening",
-        "city": "Odesa",
-        "genre": "Acoustic",
-        "price": "$7",
-        "description": "Спокійна музика на заході сонця"
-    },
-    {
-        "id": 6,
-        "title": "Electronic Party",
-        "city": "Kyiv",
-        "genre": "Electronic",
-        "price": "$20",
-        "description": "DJ сети всю ніч"
-    },
-    {
-        "id": 7,
-        "title": "Blues Night",
-        "city": "Lviv",
-        "genre": "Blues",
-        "price": "$9",
-        "description": "Класичний блюз у живому виконанні"
-    },
-    {
-        "id": 8,
-        "title": "Pop Hits Live",
-        "city": "Dnipro",
-        "genre": "Pop",
-        "price": "$11",
-        "description": "Популярні хіти наживо"
-    },
-        {
-        "id": 9,
-        "title": "Folk Stories Live",
-        "city": "Ivano-Frankivsk",
-        "genre": "Folk",
-        "price": "$6",
-        "description": "Локальні музиканти виконують сучасні фолк-пісні"
-    },
-    {
-        "id": 10,
-        "title": "Garage Band Session",
-        "city": "Ternopil",
-        "genre": "Alternative",
-        "price": "$9",
-        "description": "Виступ молодих альтернативних гуртів у камерному клубі"
-    }
-]
+def get_connection():
+    return psycopg2.connect(
+        host="db",
+        database="localgigs",
+        user="postgres",
+        password="postgres"
+    )
 
+def create_table():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS concerts (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            city TEXT NOT NULL,
+            genre TEXT NOT NULL,
+            price TEXT NOT NULL,
+            description TEXT NOT NULL
+        );
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def seed_data():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM concerts;")
+    count = cur.fetchone()[0]
+
+    if count == 0:
+        concerts = [
+            ("Jazz Night", "Dnipro", "Jazz", "$10", "Живий джаз у центрі міста"),
+            ("Rock Evening", "Kyiv", "Rock", "$15", "Локальні рок-гурти"),
+            ("Indie Vibes", "Lviv", "Indie", "$12", "Атмосферний інді-концерт"),
+            ("Hip-Hop Night", "Kharkiv", "Hip-Hop", "$8", "Батли та лайв виступи"),
+            ("Acoustic Evening", "Odesa", "Acoustic", "$7", "Спокійна музика на заході сонця"),
+            ("Electronic Party", "Kyiv", "Electronic", "$20", "DJ сети всю ніч"),
+            ("Blues Night", "Lviv", "Blues", "$9", "Класичний блюз у живому виконанні"),
+            ("Pop Hits Live", "Dnipro", "Pop", "$11", "Популярні хіти наживо"),
+            ("Folk Stories Live", "Ivano-Frankivsk", "Folk", "$6", "Локальні музиканти виконують сучасні фолк-пісні"),
+            ("Garage Band Session", "Ternopil", "Alternative", "$9", "Виступ молодих альтернативних гуртів у камерному клубі")
+        ]
+
+        cur.executemany("""
+            INSERT INTO concerts (title, city, genre, price, description)
+            VALUES (%s, %s, %s, %s, %s);
+        """, concerts)
+
+    conn.commit()
+    cur.close()
+    conn.close()
 
 @app.route("/")
 def home():
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("SELECT * FROM concerts ORDER BY id;")
+    concerts = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
     return render_template("index.html", concerts=concerts)
 
 @app.route("/items/<int:concert_id>")
 def concert_details(concert_id):
-    concert = next((item for item in concerts if item["id"] == concert_id), None)
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("SELECT * FROM concerts WHERE id = %s;", (concert_id,))
+    concert = cur.fetchone()
+
+    cur.close()
+    conn.close()
 
     if concert is None:
         return "Концерт не знайдено", 404
@@ -100,4 +91,6 @@ def concert_details(concert_id):
     return render_template("details.html", concert=concert)
 
 if __name__ == "__main__":
+    create_table()
+    seed_data()
     app.run(host="0.0.0.0", port=5000, debug=True)
