@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete — LocalGigs</title>
+</head>
+<body>
+
+<h1>Підтвердження видалення</h1>
+
+<p>Ти точно хочеш видалити цей концерт?</p>
+
+<h2>{{ concert.title }}</h2>
+<p>{{ concert.city }} • {{ concert.venue }} • {{ concert.genre }} • {{ concert.price }}</p>
+
+<form method="post" action="/admin/delete/{{ concert.id }}/confirm">
+    <button type="submit">Так, видалити</button>
+</form>
+
+<p>
+    <a href="/admin">Ні, повернутися назад</a>
+</p>
+
+</body>
+</html>

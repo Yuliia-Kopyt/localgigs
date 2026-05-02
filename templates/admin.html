@@ -22,6 +22,7 @@
             <th>Дата події</th>
             <th>Featured</th>
             <th>Створено</th>
+            <th>Дія</th>
         </tr>
     </thead>
 
@@ -37,6 +38,11 @@
             <td>{{ concert.event_date }}</td>
             <td>{{ concert.is_featured }}</td>
             <td>{{ concert.created_at }}</td>
+
+            <td>
+                <a href="/admin/toggle_featured/{{ concert.id }}">Toggle</a>
+                <a href="/admin/delete/{{ concert.id }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

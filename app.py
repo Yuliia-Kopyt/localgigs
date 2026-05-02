@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
@@ -60,7 +60,7 @@ def seed_data():
         ("Electronic Party", "Kyiv", "Module Club", "Electronic", "$20", "2026-05-20", "https://images.unsplash.com/photo-1571266028243-d220c6a7edbf", "https://example.com/electronic-party", "Ніч електронної музики з локальними DJ-сетами.", True),
         ("Blues Night", "Lviv", "Old Tram Pub", "Blues", "$9", "2026-05-22", "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4", "https://example.com/blues-night", "Класичний блюз у живому виконанні в маленькому пабі.", False),
         ("Pop Hits Live", "Dnipro", "Rooftop Stage", "Pop", "$11", "2026-05-24", "https://images.unsplash.com/photo-1501612780327-45045538702b", "https://example.com/pop-hits-live", "Популярні хіти наживо від молодих місцевих вокалістів.", False),
-        ("Folk Stories Live", "Ivano-Frankivsk", "Warm Hall", "Folk", "$6", "2026-05-26", "https://i.pinimg.com/1200x/4f/53/22/4f532239270021cff178cb053b437897.jpg", "https://example.com/folk-stories-live", "Сучасний український фолк у теплому камерному просторі.", False),
+        ("Folk Stories Live", "Ivano-Frankivsk", "Warm Hall", "Folk", "$6", "2026-05-26", "https://i.pinimg.com/1200x/4f/53/22/4f532239270021cff178cb053b437897.jpg", "https://example.com/folk-stories-live", "Сучасний український фольк у теплому камерному просторі.", False),
         ("Garage Band Session", "Ternopil", "Garage 21", "Alternative", "$9", "2026-05-28", "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b", "https://example.com/garage-band-session", "Виступ молодих альтернативних гуртів у камерному клубі.", False)
     ]
 
@@ -140,6 +140,52 @@ def admin():
     conn.close()
 
     return render_template("admin.html", concerts=concerts)
+
+@app.route("/admin/toggle_featured/<int:concert_id>")
+def toggle_featured(concert_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE concerts
+        SET is_featured = NOT is_featured
+        WHERE id = %s;
+    """, (concert_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect("/admin")
+
+@app.route("/admin/delete/<int:concert_id>")
+def delete_confirm(concert_id):
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("SELECT * FROM concerts WHERE id = %s;", (concert_id,))
+    concert = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if concert is None:
+        return "Концерт не знайдено", 404
+
+    return render_template("delete_confirm.html", concert=concert)
+
+@app.route("/admin/delete/<int:concert_id>/confirm", methods=["POST"])
+def delete_concert(concert_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM concerts WHERE id = %s;", (concert_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect("/admin")
 
 if __name__ == "__main__":
     create_table()
