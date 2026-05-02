@@ -3,18 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ concert.title }} — LocalGigs</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f1ec;
+            color: #1f1f1f;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .details {
+            max-width: 800px;
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        .featured {
+            border: 3px solid #f5b700;
+            background: #fff8dc;
+        }
+
+        .badge {
+            font-weight: bold;
+            color: #8a5a00;
+        }
+
+        img {
+            width: 100%;
+            max-height: 360px;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        .meta {
+            color: #555;
+        }
+
+        a {
+            color: #8a3ffc;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
 <a href="/">← Назад до афіші</a>
 
-<h1>{{ concert.title }}</h1>
+<div class="details {% if concert.is_featured %}featured{% endif %}">
 
-<p><strong>Місто:</strong> {{ concert.city }}</p>
-<p><strong>Жанр:</strong> {{ concert.genre }}</p>
-<p><strong>Ціна:</strong> {{ concert.price }}</p>
+    {% if concert.is_featured %}
+        <p class="badge">⭐ Featured</p>
+    {% endif %}
 
-<p>{{ concert.description }}</p>
+    <img
+    src="{{ concert.image_url }}"
+    onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400?text=No+Image';">
+
+    <h1>{{ concert.title }}</h1>
+
+    <p class="meta">
+        {{ concert.city }} • {{ concert.venue }} • {{ concert.genre }} • {{ concert.price }}
+    </p>
+
+    <p><strong>Дата:</strong> {{ concert.event_date }}</p>
+
+    <p>{{ concert.description }}</p>
+
+    <p>
+        <a href="{{ concert.contact_url }}" target="_blank">
+            Контакт / квитки
+        </a>
+    </p>
+
+</div>
 
 </body>
 </html>

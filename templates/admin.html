@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin — LocalGigs</title>
+</head>
+<body>
+
+<h1>Адмінка LocalGigs</h1>
+
+<p><a href="/">← Назад на сайт</a></p>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Назва</th>
+            <th>Місто</th>
+            <th>Місце</th>
+            <th>Жанр</th>
+            <th>Ціна</th>
+            <th>Дата події</th>
+            <th>Featured</th>
+            <th>Створено</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for concert in concerts %}
+        <tr>
+            <td>{{ concert.id }}</td>
+            <td>{{ concert.title }}</td>
+            <td>{{ concert.city }}</td>
+            <td>{{ concert.venue }}</td>
+            <td>{{ concert.genre }}</td>
+            <td>{{ concert.price }}</td>
+            <td>{{ concert.event_date }}</td>
+            <td>{{ concert.is_featured }}</td>
+            <td>{{ concert.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
