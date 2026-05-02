@@ -23,8 +23,14 @@ def create_table():
             city TEXT NOT NULL,
             genre TEXT NOT NULL,
             price TEXT NOT NULL,
-            description TEXT NOT NULL
+            description TEXT NOT NULL,
+            is_featured BOOLEAN NOT NULL DEFAULT FALSE
         );
+    """)
+
+    cur.execute("""
+        ALTER TABLE concerts
+        ADD COLUMN IF NOT EXISTS is_featured BOOLEAN NOT NULL DEFAULT FALSE;
     """)
 
     conn.commit()
@@ -40,30 +46,35 @@ def seed_data():
 
     if count == 0:
         concerts = [
-            ("Jazz Night", "Dnipro", "Jazz", "$10", "Живий джаз у центрі міста"),
-            ("Rock Evening", "Kyiv", "Rock", "$15", "Локальні рок-гурти"),
-            ("Indie Vibes", "Lviv", "Indie", "$12", "Атмосферний інді-концерт"),
-            ("Hip-Hop Night", "Kharkiv", "Hip-Hop", "$8", "Батли та лайв виступи"),
-            ("Acoustic Evening", "Odesa", "Acoustic", "$7", "Спокійна музика на заході сонця"),
-            ("Electronic Party", "Kyiv", "Electronic", "$20", "DJ сети всю ніч"),
-            ("Blues Night", "Lviv", "Blues", "$9", "Класичний блюз у живому виконанні"),
-            ("Pop Hits Live", "Dnipro", "Pop", "$11", "Популярні хіти наживо"),
-            ("Folk Stories Live", "Ivano-Frankivsk", "Folk", "$6", "Локальні музиканти виконують сучасні фолк-пісні"),
-            ("Garage Band Session", "Ternopil", "Alternative", "$9", "Виступ молодих альтернативних гуртів у камерному клубі")
+            ("Jazz Night", "Dnipro", "Jazz", "$10", "Живий джаз у центрі міста", True),
+            ("Rock Evening", "Kyiv", "Rock", "$15", "Локальні рок-гурти", False),
+            ("Indie Vibes", "Lviv", "Indie", "$12", "Атмосферний інді-концерт", True),
+            ("Hip-Hop Night", "Kharkiv", "Hip-Hop", "$8", "Батли та лайв виступи", False),
+            ("Acoustic Evening", "Odesa", "Acoustic", "$7", "Спокійна музика на заході сонця", False),
+            ("Electronic Party", "Kyiv", "Electronic", "$20", "DJ сети всю ніч", True),
+            ("Blues Night", "Lviv", "Blues", "$9", "Класичний блюз у живому виконанні", False),
+            ("Pop Hits Live", "Dnipro", "Pop", "$11", "Популярні хіти наживо", False),
+            ("Folk Stories Live", "Ivano-Frankivsk", "Folk", "$6", "Локальні музиканти виконують сучасні фолк-пісні", False),
+            ("Garage Band Session", "Ternopil", "Alternative", "$9", "Виступ молодих альтернативних гуртів у камерному клубі", False)
         ]
 
         cur.executemany("""
-            INSERT INTO concerts (title, city, genre, price, description)
-            VALUES (%s, %s, %s, %s, %s);
+            INSERT INTO concerts (title, city, genre, price, description, is_featured)
+            VALUES (%s, %s, %s, %s, %s, %s);
         """, concerts)
+
+    cur.execute("UPDATE concerts SET is_featured = FALSE;")
+
+    cur.execute("""
+        UPDATE concerts
+        SET is_featured = TRUE
+        WHERE title IN ('Jazz Night', 'Indie Vibes', 'Electronic Party');
+    """)
 
     conn.commit()
     cur.close()
     conn.close()
 
-from flask import request
-
-@app.route("/")
 @app.route("/")
 def home():
     city = request.args.get("city")
@@ -73,11 +84,18 @@ def home():
 
     if city:
         cur.execute(
-            "SELECT * FROM concerts WHERE city = %s ORDER BY id;",
+            """
+            SELECT * FROM concerts
+            WHERE city = %s
+            ORDER BY is_featured DESC, id DESC;
+            """,
             (city,)
         )
     else:
-        cur.execute("SELECT * FROM concerts ORDER BY id;")
+        cur.execute("""
+            SELECT * FROM concerts
+            ORDER BY is_featured DESC, id DESC;
+        """)
 
     concerts = cur.fetchall()
 
@@ -93,7 +111,8 @@ def home():
         cities=cities,
         selected_city=city
     )
-    
+
+@app.route("/items/<int:concert_id>")
 def concert_details(concert_id):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)

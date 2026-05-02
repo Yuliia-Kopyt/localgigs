@@ -3,6 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>LocalGigs</title>
+
+    <style>
+        .card {
+            border: 1px solid gray;
+            padding: 10px;
+            margin: 10px;
+            background: white;
+        }
+
+        .featured {
+            border: 3px solid gold;
+            background: #fff8dc;
+        }
+
+        .badge {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
@@ -26,7 +44,12 @@
 </form>
 
 {% for concert in concerts %}
-<div style="border:1px solid gray; padding:10px; margin:10px;">
+<div class="card {% if concert.is_featured %}featured{% endif %}">
+
+    {% if concert.is_featured %}
+        <p class="badge">⭐ Featured</p>
+    {% endif %}
+
     <h2>{{ concert.title }}</h2>
     <p>{{ concert.city }} • {{ concert.genre }} • {{ concert.price }}</p>
     <p>{{ concert.description }}</p>
