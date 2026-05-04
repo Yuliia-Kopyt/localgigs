@@ -187,6 +187,40 @@ def delete_concert(concert_id):
 
     return redirect("/admin")
 
+@app.route("/admin/create", methods=["GET", "POST"])
+def create_concert():
+    if request.method == "POST":
+        title = request.form["title"]
+        city = request.form["city"]
+        venue = request.form["venue"]
+        genre = request.form["genre"]
+        price = request.form["price"]
+        event_date = request.form["event_date"]
+        image_url = request.form["image_url"]
+        contact_url = request.form["contact_url"]
+        description = request.form["description"]
+        is_featured = "is_featured" in request.form
+
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            INSERT INTO concerts
+            (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """, (
+            title, city, venue, genre, price, event_date,
+            image_url, contact_url, description, is_featured
+        ))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect("/admin")
+
+    return render_template("create.html")
+
 if __name__ == "__main__":
     create_table()
     seed_data()

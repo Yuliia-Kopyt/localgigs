@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Create — LocalGigs</title>
+</head>
+<body>
+
+<h1>Додати концерт</h1>
+
+<form method="post" action="/admin/create">
+    <p>
+        <label>Назва:</label><br>
+        <input type="text" name="title" required>
+    </p>
+
+    <p>
+        <label>Місто:</label><br>
+        <input type="text" name="city" required>
+    </p>
+
+    <p>
+        <label>Місце:</label><br>
+        <input type="text" name="venue" required>
+    </p>
+
+    <p>
+        <label>Жанр:</label><br>
+        <input type="text" name="genre" required>
+    </p>
+
+    <p>
+        <label>Ціна:</label><br>
+        <input type="text" name="price" required>
+    </p>
+
+    <p>
+        <label>Дата події:</label><br>
+        <input type="date" name="event_date" required>
+    </p>
+
+    <p>
+        <label>URL фото:</label><br>
+        <input type="url" name="image_url" required>
+    </p>
+
+    <p>
+        <label>Контакт / квитки URL:</label><br>
+        <input type="url" name="contact_url" required>
+    </p>
+
+    <p>
+        <label>Опис:</label><br>
+        <textarea name="description" minlength="20" maxlength="500" required></textarea>
+    </p>
+
+    <p>
+        <label>
+            <input type="checkbox" name="is_featured">
+            Featured
+        </label>
+    </p>
+
+    <button type="submit">Зберегти</button>
+</form>
+
+<p>
+    <a href="/admin">← Назад в адмінку</a>
+</p>
+
+</body>
+</html>
