@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Login — LocalGigs</title>
+</head>
+<body>
+
+<h1>Вхід в адмінку</h1>
+
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<form method="post" action="/admin/login">
+    <p>
+        <label>Пароль:</label><br>
+        <input type="password" name="password" required>
+    </p>
+
+    <button type="submit">Увійти</button>
+</form>
+
+<p>
+    <a href="/">← Назад на сайт</a>
+</p>
+
+</body>
+</html>

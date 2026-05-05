@@ -1,8 +1,10 @@
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 
 app = Flask(__name__)
+app.secret_key = "localgigs-secret-key"
 
 def get_connection():
     return psycopg2.connect(
@@ -11,6 +13,9 @@ def get_connection():
         user="postgres",
         password="postgres"
     )
+
+def is_admin_logged_in():
+    return session.get("admin_logged_in") == True
 
 def create_table():
     conn = get_connection()
@@ -125,8 +130,32 @@ def concert_details(concert_id):
 
     return render_template("details.html", concert=concert)
 
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    error = None
+
+    if request.method == "POST":
+        password = request.form["password"]
+        admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+
+        if password == admin_password:
+            session["admin_logged_in"] = True
+            return redirect("/admin")
+        else:
+            error = "Неправильний пароль"
+
+    return render_template("login.html", error=error)
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.clear()
+    return redirect("/")
+
 @app.route("/admin")
 def admin():
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -144,6 +173,9 @@ def admin():
 
 @app.route("/admin/create", methods=["GET", "POST"])
 def create_concert():
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
     if request.method == "POST":
         title = request.form["title"]
         city = request.form["city"]
@@ -178,6 +210,9 @@ def create_concert():
 
 @app.route("/admin/edit/<int:concert_id>", methods=["GET", "POST"])
 def edit_concert(concert_id):
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -231,6 +266,9 @@ def edit_concert(concert_id):
 
 @app.route("/admin/toggle_featured/<int:concert_id>")
 def toggle_featured(concert_id):
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
     conn = get_connection()
     cur = conn.cursor()
 
@@ -248,6 +286,9 @@ def toggle_featured(concert_id):
 
 @app.route("/admin/delete/<int:concert_id>")
 def delete_confirm(concert_id):
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -264,6 +305,9 @@ def delete_confirm(concert_id):
 
 @app.route("/admin/delete/<int:concert_id>/confirm", methods=["POST"])
 def delete_concert(concert_id):
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
     conn = get_connection()
     cur = conn.cursor()
 
