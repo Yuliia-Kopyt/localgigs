@@ -2,20 +2,22 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>404 — Не знайдено</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — LocalGigs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>😢 404</h1>
-<h2>Сторінку не знайдено</h2>
-
-<p>
-    Можливо, концерт видалили або посилання неправильне
-</p>
-
-<p>
-    <a href="/">← Повернутися на головну</a>
-</p>
+<main class="admin-page">
+    <section class="admin-card error-card">
+        <p class="error-code">404</p>
+        <h1>Сторінку не знайдено</h1>
+        <p class="error-message">
+            Можливо, концерт видалили або посилання неправильне.
+        </p>
+        <a class="admin-button" href="/">← На головну</a>
+    </section>
+</main>
 
 </body>
 </html>

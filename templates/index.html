@@ -2,99 +2,94 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LocalGigs</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f1ec;
-            color: #1f1f1f;
-            margin: 0;
-            padding: 24px;
-        }
-
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 14px;
-            padding: 16px;
-            margin: 16px 0;
-            background: white;
-            max-width: 720px;
-        }
-
-        .featured {
-            border: 3px solid #f5b700;
-            background: #fff8dc;
-        }
-
-        .badge {
-            font-weight: bold;
-            color: #8a5a00;
-        }
-
-        .concert-image {
-            width: 100%;
-            max-height: 260px;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-
-        .meta {
-            color: #555;
-        }
-
-        a {
-            color: #8a3ffc;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>🎶 LocalGigs</h1>
-<p><a href="/admin/login">Адмінка</a></p>
+<header class="hero">
+    <nav class="navbar">
+        <div class="logo">🎶 LocalGigs</div>
+        <a class="admin-link" href="/admin/login">🔐 Адмінка</a>
+    </nav>
 
-<form method="get" action="/">
-    <label for="city">Фільтр за містом:</label>
+    <div class="hero-content">
+        <p class="eyebrow">Local music guide</p>
+        <h1>Відкрий живу музику поруч із собою</h1>
+        <p class="hero-text">
+            Афіша локальних концертів, камерних виступів і незалежних музикантів у містах України.
+        </p>
+    </div>
+</header>
 
-    <select name="city" id="city">
-        <option value="">Усі міста</option>
+<main class="container">
 
-        {% for city in cities %}
-            <option value="{{ city.city }}" {% if selected_city == city.city %}selected{% endif %}>
-                {{ city.city }}
-            </option>
+    <section class="filter-card">
+        <form method="get" action="/" class="filter-form">
+            <label for="city">Фільтр за містом</label>
+
+            <select name="city" id="city">
+                <option value="">Усі міста</option>
+
+                {% for city in cities %}
+                    <option value="{{ city.city }}" {% if selected_city == city.city %}selected{% endif %}>
+                        {{ city.city }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Показати</button>
+            <a class="reset-link" href="/">Скинути</a>
+        </form>
+    </section>
+
+    <section class="section-heading">
+        <h2>Найближчі виступи</h2>
+        <p>Обери концерт, який пасує твоєму настрою.</p>
+    </section>
+
+    <section class="grid">
+        {% for concert in concerts %}
+        <article class="concert-card {% if concert.is_featured %}featured{% endif %}">
+
+            <div class="image-wrap">
+                {% if concert.is_featured %}
+                    <span class="featured-badge">⭐ Featured</span>
+                {% endif %}
+
+                <img src="{{ concert.image_url }}" alt="{{ concert.title }}">
+            </div>
+
+            <div class="card-content">
+                <div class="card-top">
+                    <span class="genre">{{ concert.genre }}</span>
+                    <span class="price">{{ concert.price }}</span>
+                </div>
+
+                <h3>{{ concert.title }}</h3>
+
+                <p class="meta">
+                    📍 {{ concert.city }} • {{ concert.venue }}
+                </p>
+
+                <p class="date">
+                    🗓 {{ concert.event_date }}
+                </p>
+
+                <p class="description">
+                    {{ concert.description }}
+                </p>
+
+                <a class="details-button" href="/items/{{ concert.id }}">
+                    Детальніше →
+                </a>
+            </div>
+        </article>
         {% endfor %}
-    </select>
+    </section>
 
-    <button type="submit">Показати</button>
-    <a href="/">Скинути</a>
-</form>
-
-{% for concert in concerts %}
-<div class="card {% if concert.is_featured %}featured{% endif %}">
-
-    {% if concert.is_featured %}
-        <p class="badge">⭐ Featured</p>
-    {% endif %}
-
-   <img class="concert-image"
-     src="{{ concert.image_url }}"
-     onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400?text=No+Image';">
-
-    <h2>{{ concert.title }}</h2>
-
-    <p class="meta">
-        {{ concert.city }} • {{ concert.venue }} • {{ concert.genre }} • {{ concert.price }}
-    </p>
-
-    <p><strong>Дата:</strong> {{ concert.event_date }}</p>
-
-    <p>{{ concert.description }}</p>
-
-    <a href="/items/{{ concert.id }}">Детальніше</a>
-</div>
-{% endfor %}
+</main>
 
 </body>
 </html>

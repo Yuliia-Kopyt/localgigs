@@ -55,6 +55,30 @@
     </p>
 
     <p>
+    <p>
+    <label>Організатор:</label><br>
+    <input type="text" name="organizer" value="{{ concert.organizer }}" required>
+    </p>
+
+    <p>
+        <label>Час початку:</label><br>
+        <input type="text" name="start_time" value="{{ concert.start_time }}" required>
+    </p>
+
+    <p>
+        <label>Тривалість:</label><br>
+        <input type="text" name="duration" value="{{ concert.duration }}" required>
+    </p>
+
+    <p>
+        <label>Вікове обмеження:</label><br>
+        <input type="text" name="age_limit" value="{{ concert.age_limit }}" required>
+    </p>
+
+    <p>
+        <label>Атмосфера:</label><br>
+        <input type="text" name="mood" value="{{ concert.mood }}" required>
+    </p>
         <label>
             <input type="checkbox" name="is_featured" {% if concert.is_featured %}checked{% endif %}>
             Featured

@@ -2,82 +2,85 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ concert.title }} — LocalGigs</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f1ec;
-            color: #1f1f1f;
-            margin: 0;
-            padding: 24px;
-        }
-
-        .details {
-            max-width: 800px;
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-        }
-
-        .featured {
-            border: 3px solid #f5b700;
-            background: #fff8dc;
-        }
-
-        .badge {
-            font-weight: bold;
-            color: #8a5a00;
-        }
-
-        img {
-            width: 100%;
-            max-height: 360px;
-            object-fit: cover;
-            border-radius: 14px;
-        }
-
-        .meta {
-            color: #555;
-        }
-
-        a {
-            color: #8a3ffc;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<a href="/">← Назад до афіші</a>
+<header class="page-header">
+    <nav class="navbar">
+        <a class="logo" href="/">🎶 LocalGigs</a>
+        <a class="admin-link" href="/admin/login">🔐 Адмінка</a>
+    </nav>
+</header>
 
-<div class="details {% if concert.is_featured %}featured{% endif %}">
+<main class="details-container">
 
-    {% if concert.is_featured %}
-        <p class="badge">⭐ Featured</p>
-    {% endif %}
+    <a class="back-link" href="/">← Назад до афіші</a>
 
-    <img
-    src="{{ concert.image_url }}"
-    onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400?text=No+Image';">
+    <article class="details-card {% if concert.is_featured %}featured{% endif %}">
 
-    <h1>{{ concert.title }}</h1>
+        <div class="details-image-wrap">
+            {% if concert.is_featured %}
+                <span class="featured-badge">⭐ Featured</span>
+            {% endif %}
 
-    <p class="meta">
-        {{ concert.city }} • {{ concert.venue }} • {{ concert.genre }} • {{ concert.price }}
-    </p>
+            <img src="{{ concert.image_url }}" alt="{{ concert.title }}">
+        </div>
 
-    <p><strong>Дата:</strong> {{ concert.event_date }}</p>
+        <div class="details-content">
+            <div class="card-top">
+                <span class="genre">{{ concert.genre }}</span>
+                <span class="price">{{ concert.price }}</span>
+            </div>
 
-    <p>{{ concert.description }}</p>
+            <h1>{{ concert.title }}</h1>
 
-    <p>
-        <a href="{{ concert.contact_url }}" target="_blank">
-            Контакт / квитки
-        </a>
-    </p>
+            <p class="meta">📍 {{ concert.city }} • {{ concert.venue }}</p>
+            <p class="date">🗓 {{ concert.event_date }}</p>
 
-</div>
+            <section class="details-info-grid">
+                <div class="info-box">
+                    <span>Організатор</span>
+                    <strong>{{ concert.organizer }}</strong>
+                </div>
+
+                <div class="info-box">
+                    <span>Початок</span>
+                    <strong>{{ concert.start_time }}</strong>
+                </div>
+
+                <div class="info-box">
+                    <span>Тривалість</span>
+                    <strong>{{ concert.duration }}</strong>
+                </div>
+
+                <div class="info-box">
+                    <span>Вік</span>
+                    <strong>{{ concert.age_limit }}</strong>
+                </div>
+
+                <div class="info-box wide">
+                    <span>Атмосфера</span>
+                    <strong>{{ concert.mood }}</strong>
+                </div>
+            </section>
+
+            <h2>Про концерт</h2>
+
+            <p class="details-description">
+                {{ concert.description }}
+            </p>
+
+            <a class="details-button" href="https://karabas.com/?gad_source=1&gad_campaignid=22928650687&gbraid=0AAAABBLmiXrfxdrunTQ8J9MJ4tNMIu8O1&gclid=CjwKCAjwqubPBhBOEiwAzgZX2mvhBD_hf9kqx9rG75Tc_hZ7y6YELlacJNO9-8usaFuzwWn9FN1paBoCfckQAvD_BwE" target="_blank">
+                🎟 Контакт / квитки →
+            </a>
+        </div>
+
+    </article>
+
+</main>
 
 </body>
 </html>

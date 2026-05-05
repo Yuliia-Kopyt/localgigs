@@ -50,6 +50,11 @@ def create_table():
             image_url TEXT DEFAULT '',
             contact_url TEXT DEFAULT '',
             description TEXT NOT NULL,
+            organizer TEXT DEFAULT '',
+            start_time TEXT DEFAULT '',
+            duration TEXT DEFAULT '',
+            age_limit TEXT DEFAULT '',
+            mood TEXT DEFAULT '',
             is_featured BOOLEAN NOT NULL DEFAULT FALSE,
             is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -60,6 +65,11 @@ def create_table():
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS event_date TEXT DEFAULT '';")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS image_url TEXT DEFAULT '';")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS contact_url TEXT DEFAULT '';")
+    cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS organizer TEXT DEFAULT '';")
+    cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS start_time TEXT DEFAULT '';")
+    cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS duration TEXT DEFAULT '';")
+    cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS age_limit TEXT DEFAULT '';")
+    cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS mood TEXT DEFAULT '';")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS is_featured BOOLEAN NOT NULL DEFAULT FALSE;")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE;")
@@ -88,22 +98,23 @@ def seed_data():
 
     if count == 0:
         concerts = [
-            ("Jazz Night", "Dnipro", "Blue Note Club", "Jazz", "$10", "2026-05-10", "https://images.unsplash.com/photo-1511192336575-5a79af67a629", "https://example.com/jazz-night", "Живий джаз у центрі міста з місцевим квартетом.", True),
-            ("Rock Evening", "Kyiv", "Atlas Club", "Rock", "$15", "2026-05-12", "https://images.unsplash.com/photo-1501386761578-eac5c94b800a", "https://example.com/rock-evening", "Локальні рок-гурти, гітари, драйв і вечірня атмосфера.", False),
-            ("Indie Vibes", "Lviv", "Dzyga Art Center", "Indie", "$12", "2026-05-14", "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f", "https://example.com/indie-vibes", "Атмосферний інді-концерт для тих, хто любить камерні виступи.", True),
-            ("Hip-Hop Night", "Kharkiv", "Urban Stage", "Hip-Hop", "$8", "2026-05-16", "https://img.redbull.com/images/q_auto,f_auto/redbullcom/2023/12/5/xdaxjmwkryffxwc5yy9l/hip-hop-for-hopw-showcase", "https://example.com/hip-hop-night", "Батли, лайв-виступи та молоді локальні артисти.", False),
-            ("Acoustic Evening", "Odesa", "Sea View Bar", "Acoustic", "$7", "2026-05-18", "https://images.unsplash.com/photo-1510915361894-db8b60106cb1", "https://example.com/acoustic-evening", "Спокійна акустична музика біля моря на заході сонця.", False),
-            ("Electronic Party", "Kyiv", "Module Club", "Electronic", "$20", "2026-05-20", "https://images.unsplash.com/photo-1571266028243-d220c6a7edbf", "https://example.com/electronic-party", "Ніч електронної музики з локальними DJ-сетами.", True),
-            ("Blues Night", "Lviv", "Old Tram Pub", "Blues", "$9", "2026-05-22", "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4", "https://example.com/blues-night", "Класичний блюз у живому виконанні в маленькому пабі.", False),
-            ("Pop Hits Live", "Dnipro", "Rooftop Stage", "Pop", "$11", "2026-05-24", "https://images.unsplash.com/photo-1501612780327-45045538702b", "https://example.com/pop-hits-live", "Популярні хіти наживо від молодих місцевих вокалістів.", False),
-            ("Folk Stories Live", "Ivano-Frankivsk", "Warm Hall", "Folk", "$6", "2026-05-26", "https://i.pinimg.com/1200x/4f/53/22/4f532239270021cff178cb053b437897.jpg", "https://example.com/folk-stories-live", "Сучасний український фольк у теплому камерному просторі.", False),
-            ("Garage Band Session", "Ternopil", "Garage 21", "Alternative", "$9", "2026-05-28", "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b", "https://example.com/garage-band-session", "Виступ молодих альтернативних гуртів у камерному клубі.", False)
+            ("Jazz Night", "Dnipro", "Blue Note Club", "Jazz", "$10", "2026-05-10", "https://images.unsplash.com/photo-1511192336575-5a79af67a629", "https://example.com/jazz-night", "Живий джаз у центрі міста з місцевим квартетом.", "Dnipro Jazz Community", "19:30", "2 години", "12+", "камерна, тепла, вечірня", True),
+            ("Rock Evening", "Kyiv", "Atlas Club", "Rock", "$15", "2026-05-12", "https://images.unsplash.com/photo-1501386761578-eac5c94b800a", "https://example.com/rock-evening", "Локальні рок-гурти, гітари, драйв і вечірня атмосфера.", "Kyiv Rock Union", "20:00", "2.5 години", "16+", "гучна, драйвова, клубна", False),
+            ("Indie Vibes", "Lviv", "Dzyga Art Center", "Indie", "$12", "2026-05-14", "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f", "https://example.com/indie-vibes", "Атмосферний інді-концерт для тих, хто любить камерні виступи.", "Lviv Indie Scene", "18:30", "1.5 години", "14+", "мрійлива, спокійна, атмосферна", True),
+            ("Hip-Hop Night", "Kharkiv", "Urban Stage", "Hip-Hop", "$8", "2026-05-16", "https://img.redbull.com/images/q_auto,f_auto/redbullcom/2023/12/5/xdaxjmwkryffxwc5yy9l/hip-hop-for-hopw-showcase", "https://example.com/hip-hop-night", "Батли, лайв-виступи та молоді локальні артисти.", "Urban Music Community", "21:00", "3 години", "16+", "енергійна, вулична, батлова", False),
+            ("Acoustic Evening", "Odesa", "Sea View Bar", "Acoustic", "$7", "2026-05-18", "https://images.unsplash.com/photo-1510915361894-db8b60106cb1", "https://example.com/acoustic-evening", "Спокійна акустична музика біля моря на заході сонця.", "Odesa Acoustic Sessions", "19:00", "1.5 години", "0+", "романтична, морська, спокійна", False),
+            ("Electronic Party", "Kyiv", "Module Club", "Electronic", "$20", "2026-05-20", "https://images.unsplash.com/photo-1571266028243-d220c6a7edbf", "https://example.com/electronic-party", "Ніч електронної музики з локальними DJ-сетами.", "Module Electronic Crew", "22:00", "5 годин", "18+", "нічна, танцювальна, неонова", True),
+            ("Blues Night", "Lviv", "Old Tram Pub", "Blues", "$9", "2026-05-22", "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4", "https://example.com/blues-night", "Класичний блюз у живому виконанні в маленькому пабі.", "Old Tram Live Music", "20:30", "2 години", "16+", "душевна, блюзова, пабна", False),
+            ("Pop Hits Live", "Dnipro", "Rooftop Stage", "Pop", "$11", "2026-05-24", "https://images.unsplash.com/photo-1501612780327-45045538702b", "https://example.com/pop-hits-live", "Популярні хіти наживо від молодих місцевих вокалістів.", "Rooftop Music Dnipro", "19:00", "2 години", "12+", "легка, яскрава, літня", False),
+            ("Folk Stories Live", "Ivano-Frankivsk", "Warm Hall", "Folk", "$6", "2026-05-26", "https://i.pinimg.com/1200x/4f/53/22/4f532239270021cff178cb053b437897.jpg", "https://example.com/folk-stories-live", "Сучасний український фольк у теплому камерному просторі.", "Frankivsk Folk Hub", "18:00", "1.5 години", "0+", "тепла, народна, затишна", False),
+            ("Garage Band Session", "Ternopil", "Garage 21", "Alternative", "$9", "2026-05-28", "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b", "https://example.com/garage-band-session", "Виступ молодих альтернативних гуртів у камерному клубі.", "Garage 21 Team", "20:00", "2 години", "16+", "альтернативна, молода, жива", False)
         ]
 
         cur.executemany("""
             INSERT INTO concerts
-            (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            (title, city, venue, genre, price, event_date, image_url, contact_url, description,
+             organizer, start_time, duration, age_limit, mood, is_featured)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """, concerts)
 
     conn.commit()
@@ -224,6 +235,11 @@ def create_concert():
         image_url = request.form["image_url"]
         contact_url = request.form["contact_url"]
         description = request.form["description"]
+        organizer = request.form["organizer"]
+        start_time = request.form["start_time"]
+        duration = request.form["duration"]
+        age_limit = request.form["age_limit"]
+        mood = request.form["mood"]
         is_featured = "is_featured" in request.form
 
         conn = get_connection()
@@ -231,10 +247,14 @@ def create_concert():
 
         cur.execute("""
             INSERT INTO concerts
-            (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (title, city, venue, genre, price, event_date, image_url, contact_url, description,
+             organizer, start_time, duration, age_limit, mood, is_featured)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id;
-        """, (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured))
+        """, (
+            title, city, venue, genre, price, event_date, image_url, contact_url, description,
+            organizer, start_time, duration, age_limit, mood, is_featured
+        ))
 
         concert_id = cur.fetchone()[0]
 
@@ -267,6 +287,11 @@ def edit_concert(concert_id):
         image_url = request.form["image_url"]
         contact_url = request.form["contact_url"]
         description = request.form["description"]
+        organizer = request.form["organizer"]
+        start_time = request.form["start_time"]
+        duration = request.form["duration"]
+        age_limit = request.form["age_limit"]
+        mood = request.form["mood"]
         is_featured = "is_featured" in request.form
 
         cur.execute("""
@@ -280,9 +305,17 @@ def edit_concert(concert_id):
                 image_url = %s,
                 contact_url = %s,
                 description = %s,
+                organizer = %s,
+                start_time = %s,
+                duration = %s,
+                age_limit = %s,
+                mood = %s,
                 is_featured = %s
             WHERE id = %s;
-        """, (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured, concert_id))
+        """, (
+            title, city, venue, genre, price, event_date, image_url, contact_url, description,
+            organizer, start_time, duration, age_limit, mood, is_featured, concert_id
+        ))
 
         conn.commit()
         cur.close()
