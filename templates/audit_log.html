@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Audit Log — LocalGigs</title>
+</head>
+<body>
+
+<h1>Audit log</h1>
+
+<p><a href="/admin">← Назад в адмінку</a></p>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Admin</th>
+            <th>Action</th>
+            <th>Concert ID</th>
+            <th>Created at</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for action in actions %}
+        <tr>
+            <td>{{ action.id }}</td>
+            <td>{{ action.admin_name }}</td>
+            <td>{{ action.action }}</td>
+            <td>{{ action.concert_id }}</td>
+            <td>{{ action.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

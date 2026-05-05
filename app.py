@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, redirect, session
 app = Flask(__name__)
 app.secret_key = "localgigs-secret-key"
 
+
 def get_connection():
     return psycopg2.connect(
         host="db",
@@ -14,8 +15,24 @@ def get_connection():
         password="postgres"
     )
 
+
 def is_admin_logged_in():
     return session.get("admin_logged_in") == True
+
+
+def log_admin_action(action, concert_id=None):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO admin_actions (admin_name, action, concert_id)
+        VALUES (%s, %s, %s);
+    """, ("admin", action, concert_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
 
 def create_table():
     conn = get_connection()
@@ -34,6 +51,7 @@ def create_table():
             contact_url TEXT DEFAULT '',
             description TEXT NOT NULL,
             is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
@@ -44,10 +62,22 @@ def create_table():
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS contact_url TEXT DEFAULT '';")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
     cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS is_featured BOOLEAN NOT NULL DEFAULT FALSE;")
+    cur.execute("ALTER TABLE concerts ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE;")
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS admin_actions (
+            id SERIAL PRIMARY KEY,
+            admin_name TEXT NOT NULL,
+            action TEXT NOT NULL,
+            concert_id INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
 
     conn.commit()
     cur.close()
     conn.close()
+
 
 def seed_data():
     conn = get_connection()
@@ -80,6 +110,7 @@ def seed_data():
     cur.close()
     conn.close()
 
+
 @app.route("/")
 def home():
     city = request.args.get("city")
@@ -90,45 +121,50 @@ def home():
     if city:
         cur.execute("""
             SELECT * FROM concerts
-            WHERE city = %s
+            WHERE city = %s AND is_deleted = FALSE
             ORDER BY is_featured DESC, created_at DESC;
         """, (city,))
     else:
         cur.execute("""
             SELECT * FROM concerts
+            WHERE is_deleted = FALSE
             ORDER BY is_featured DESC, created_at DESC;
         """)
 
     concerts = cur.fetchall()
 
-    cur.execute("SELECT DISTINCT city FROM concerts ORDER BY city;")
+    cur.execute("""
+        SELECT DISTINCT city FROM concerts
+        WHERE is_deleted = FALSE
+        ORDER BY city;
+    """)
     cities = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return render_template(
-        "index.html",
-        concerts=concerts,
-        cities=cities,
-        selected_city=city
-    )
+    return render_template("index.html", concerts=concerts, cities=cities, selected_city=city)
+
 
 @app.route("/items/<int:concert_id>")
 def concert_details(concert_id):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    cur.execute("SELECT * FROM concerts WHERE id = %s;", (concert_id,))
+    cur.execute("""
+        SELECT * FROM concerts
+        WHERE id = %s AND is_deleted = FALSE;
+    """, (concert_id,))
     concert = cur.fetchone()
 
     cur.close()
     conn.close()
 
     if concert is None:
-        return "Концерт не знайдено", 404
+        return render_template("404.html"), 404
 
     return render_template("details.html", concert=concert)
+
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -146,10 +182,12 @@ def admin_login():
 
     return render_template("login.html", error=error)
 
+
 @app.route("/admin/logout")
 def admin_logout():
     session.clear()
     return redirect("/")
+
 
 @app.route("/admin")
 def admin():
@@ -161,15 +199,15 @@ def admin():
 
     cur.execute("""
         SELECT * FROM concerts
-        ORDER BY created_at DESC;
+        ORDER BY is_deleted ASC, created_at DESC;
     """)
-
     concerts = cur.fetchall()
 
     cur.close()
     conn.close()
 
     return render_template("admin.html", concerts=concerts)
+
 
 @app.route("/admin/create", methods=["GET", "POST"])
 def create_concert():
@@ -194,19 +232,22 @@ def create_concert():
         cur.execute("""
             INSERT INTO concerts
             (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-        """, (
-            title, city, venue, genre, price, event_date,
-            image_url, contact_url, description, is_featured
-        ))
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id;
+        """, (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured))
+
+        concert_id = cur.fetchone()[0]
 
         conn.commit()
         cur.close()
         conn.close()
 
+        log_admin_action("created concert", concert_id)
+
         return redirect("/admin")
 
     return render_template("create.html")
+
 
 @app.route("/admin/edit/<int:concert_id>", methods=["GET", "POST"])
 def edit_concert(concert_id):
@@ -241,15 +282,13 @@ def edit_concert(concert_id):
                 description = %s,
                 is_featured = %s
             WHERE id = %s;
-        """, (
-            title, city, venue, genre, price, event_date,
-            image_url, contact_url, description, is_featured,
-            concert_id
-        ))
+        """, (title, city, venue, genre, price, event_date, image_url, contact_url, description, is_featured, concert_id))
 
         conn.commit()
         cur.close()
         conn.close()
+
+        log_admin_action("edited concert", concert_id)
 
         return redirect("/admin")
 
@@ -260,9 +299,10 @@ def edit_concert(concert_id):
     conn.close()
 
     if concert is None:
-        return "Концерт не знайдено", 404
+        return render_template("404.html"), 404
 
     return render_template("edit.html", concert=concert)
+
 
 @app.route("/admin/toggle_featured/<int:concert_id>")
 def toggle_featured(concert_id):
@@ -282,7 +322,10 @@ def toggle_featured(concert_id):
     cur.close()
     conn.close()
 
+    log_admin_action("toggled featured", concert_id)
+
     return redirect("/admin")
+
 
 @app.route("/admin/delete/<int:concert_id>")
 def delete_confirm(concert_id):
@@ -299,9 +342,10 @@ def delete_confirm(concert_id):
     conn.close()
 
     if concert is None:
-        return "Концерт не знайдено", 404
+        return render_template("404.html"), 404
 
     return render_template("delete_confirm.html", concert=concert)
+
 
 @app.route("/admin/delete/<int:concert_id>/confirm", methods=["POST"])
 def delete_concert(concert_id):
@@ -311,13 +355,68 @@ def delete_concert(concert_id):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM concerts WHERE id = %s;", (concert_id,))
+    cur.execute("""
+        UPDATE concerts
+        SET is_deleted = TRUE
+        WHERE id = %s;
+    """, (concert_id,))
 
     conn.commit()
     cur.close()
     conn.close()
 
+    log_admin_action("soft deleted concert", concert_id)
+
     return redirect("/admin")
+
+
+@app.route("/admin/restore/<int:concert_id>")
+def restore_concert(concert_id):
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE concerts
+        SET is_deleted = FALSE
+        WHERE id = %s;
+    """, (concert_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    log_admin_action("restored concert", concert_id)
+
+    return redirect("/admin")
+
+
+@app.route("/admin/audit-log")
+def audit_log():
+    if not is_admin_logged_in():
+        return redirect("/admin/login")
+
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("""
+        SELECT * FROM admin_actions
+        ORDER BY created_at DESC;
+    """)
+    actions = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("audit_log.html", actions=actions)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
+
 
 if __name__ == "__main__":
     create_table()
