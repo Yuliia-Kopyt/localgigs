@@ -2,63 +2,70 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin — LocalGigs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Адмінка LocalGigs</h1>
+<main class="admin-page">
+    <div class="admin-container">
+        <section class="admin-card">
+            <div class="admin-header">
+                <h1>Адмінка LocalGigs</h1>
 
-<p><a href="/admin/create">➕ Додати концерт</a></p>
-<p><a href="/admin/audit-log">📜 Audit log</a></p>
-<p><a href="/">← Назад на сайт</a></p>
-<p><a href="/admin/logout">Вийти</a></p>
+                <div class="admin-actions">
+                    <a class="admin-button" href="/admin/create">➕ Додати</a>
+                    <a class="secondary-button" href="/admin/audit-log">📜 Audit log</a>
+                    <a class="secondary-button" href="/">← Сайт</a>
+                    <a class="danger-button" href="/admin/logout">Вийти</a>
+                </div>
+            </div>
 
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Назва</th>
-            <th>Місто</th>
-            <th>Місце</th>
-            <th>Жанр</th>
-            <th>Ціна</th>
-            <th>Дата події</th>
-            <th>Featured</th>
-            <th>Deleted</th>
-            <th>Створено</th>
-            <th>Дія</th>
-        </tr>
-    </thead>
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Назва</th>
+                            <th>Місто</th>
+                            <th>Жанр</th>
+                            <th>Ціна</th>
+                            <th>Дата</th>
+                            <th>Featured</th>
+                            <th>Deleted</th>
+                            <th>Дія</th>
+                        </tr>
+                    </thead>
 
-    <tbody>
-        {% for concert in concerts %}
-        <tr>
-            <td>{{ concert.id }}</td>
-            <td>{{ concert.title }}</td>
-            <td>{{ concert.city }}</td>
-            <td>{{ concert.venue }}</td>
-            <td>{{ concert.genre }}</td>
-            <td>{{ concert.price }}</td>
-            <td>{{ concert.event_date }}</td>
-            <td>{{ concert.is_featured }}</td>
-            <td>{{ concert.is_deleted }}</td>
-            <td>{{ concert.created_at }}</td>
-
-            <td>
-                {% if concert.is_deleted %}
-                    <a href="/admin/restore/{{ concert.id }}">Restore</a>
-                {% else %}
-                    <a href="/admin/edit/{{ concert.id }}">Edit</a>
-                    |
-                    <a href="/admin/toggle_featured/{{ concert.id }}">Toggle</a>
-                    |
-                    <a href="/admin/delete/{{ concert.id }}">Delete</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    <tbody>
+                        {% for concert in concerts %}
+                        <tr class="{% if concert.is_deleted %}deleted-row{% endif %}">
+                            <td>{{ concert.id }}</td>
+                            <td>{{ concert.title }}</td>
+                            <td>{{ concert.city }}</td>
+                            <td>{{ concert.genre }}</td>
+                            <td>{{ concert.price }}</td>
+                            <td>{{ concert.event_date }}</td>
+                            <td>{{ concert.is_featured }}</td>
+                            <td>{{ concert.is_deleted }}</td>
+                            <td>
+                                {% if concert.is_deleted %}
+                                    <a class="admin-button" href="/admin/restore/{{ concert.id }}">Restore</a>
+                                {% else %}
+                                    <a class="secondary-button" href="/admin/edit/{{ concert.id }}">Edit</a>
+                                    <a class="secondary-button" href="/admin/toggle_featured/{{ concert.id }}">Toggle</a>
+                                    <a class="danger-button" href="/admin/delete/{{ concert.id }}">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
 
 </body>
 </html>

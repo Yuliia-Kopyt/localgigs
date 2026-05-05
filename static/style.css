@@ -618,3 +618,67 @@ button {
         text-align: center;
     }
 }
+
+.subtitle {
+    color: #a78bfa;
+    margin-bottom: 16px;
+}
+
+.admin-header {
+    margin-bottom: 20px;
+}
+
+.badge {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: radial-gradient(circle at top, #1e1b4b, #0f0f1a);
+}
+
+.login-card {
+    background: #1f1b2e;
+    padding: 40px;
+    border-radius: 20px;
+    width: 320px;
+    text-align: center;
+
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+}
+
+.login-card h1 {
+    margin-bottom: 20px;
+}
+
+.admin-form input {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.secondary-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: #a78bfa;
+    text-decoration: none;
+}
+
+.secondary-link:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}

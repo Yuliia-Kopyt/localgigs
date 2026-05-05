@@ -2,37 +2,62 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audit Log — LocalGigs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Audit log</h1>
+<main class="admin-page">
 
-<p><a href="/admin">← Назад в адмінку</a></p>
+    <section class="admin-header">
+        <h1>Audit Log</h1>
+        <p class="subtitle">Історія дій адміністратора</p>
 
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Admin</th>
-            <th>Action</th>
-            <th>Concert ID</th>
-            <th>Created at</th>
-        </tr>
-    </thead>
+        <div class="admin-links">
+            <a href="/admin" class="secondary-button">← Назад</a>
+        </div>
+    </section>
 
-    <tbody>
-        {% for action in actions %}
-        <tr>
-            <td>{{ action.id }}</td>
-            <td>{{ action.admin_name }}</td>
-            <td>{{ action.action }}</td>
-            <td>{{ action.concert_id }}</td>
-            <td>{{ action.created_at }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <section class="admin-card">
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Admin</th>
+                    <th>Action</th>
+                    <th>Concert</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for action in actions %}
+                <tr>
+                    <td>#{{ action.id }}</td>
+                    <td>{{ action.admin_name }}</td>
+                    <td>
+                        <span class="badge">
+                            {{ action.action }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if action.concert_id %}
+                            #{{ action.concert_id }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ action.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </section>
+
+</main>
 
 </body>
 </html>

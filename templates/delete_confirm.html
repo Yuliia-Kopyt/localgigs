@@ -2,24 +2,39 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delete — LocalGigs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Підтвердження видалення</h1>
+<main class="admin-page">
+    <section class="admin-card delete-card">
+        <h1>Підтвердження видалення</h1>
 
-<p>Ти точно хочеш видалити цей концерт?</p>
+        <p class="error-message">
+            Ти точно хочеш приховати цей концерт із публічної афіші?
+        </p>
 
-<h2>{{ concert.title }}</h2>
-<p>{{ concert.city }} • {{ concert.venue }} • {{ concert.genre }} • {{ concert.price }}</p>
+        <h2>{{ concert.title }}</h2>
 
-<form method="post" action="/admin/delete/{{ concert.id }}/confirm">
-    <button type="submit">Так, видалити</button>
-</form>
+        <p class="meta">
+            {{ concert.city }} • {{ concert.venue }} • {{ concert.genre }} • {{ concert.price }}
+        </p>
 
-<p>
-    <a href="/admin">Ні, повернутися назад</a>
-</p>
+        <form method="post" action="/admin/delete/{{ concert.id }}/confirm">
+            <button class="danger-button" type="submit">
+                Так, видалити
+            </button>
+        </form>
+
+        <p>
+            <a class="secondary-button" href="/admin">
+                Ні, повернутися назад
+            </a>
+        </p>
+    </section>
+</main>
 
 </body>
 </html>

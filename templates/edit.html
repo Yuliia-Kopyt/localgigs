@@ -2,95 +2,105 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit — LocalGigs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Редагувати концерт</h1>
+<main class="admin-page">
+    <section class="admin-card form-card">
 
-<form method="post" action="/admin/edit/{{ concert.id }}">
-    <p>
-        <label>Назва:</label><br>
-        <input type="text" name="title" value="{{ concert.title }}" required>
-    </p>
+        <div class="admin-header">
+            <h1>Редагувати концерт</h1>
+            <a class="secondary-button" href="/admin">← Назад</a>
+        </div>
 
-    <p>
-        <label>Місто:</label><br>
-        <input type="text" name="city" value="{{ concert.city }}" required>
-    </p>
+        <form method="post" action="/admin/edit/{{ concert.id }}" class="form-grid">
 
-    <p>
-        <label>Місце:</label><br>
-        <input type="text" name="venue" value="{{ concert.venue }}" required>
-    </p>
+            <div class="form-field">
+                <label>Назва</label>
+                <input type="text" name="title" value="{{ concert.title }}" required>
+            </div>
 
-    <p>
-        <label>Жанр:</label><br>
-        <input type="text" name="genre" value="{{ concert.genre }}" required>
-    </p>
+            <div class="form-field">
+                <label>Місто</label>
+                <input type="text" name="city" value="{{ concert.city }}" required>
+            </div>
 
-    <p>
-        <label>Ціна:</label><br>
-        <input type="text" name="price" value="{{ concert.price }}" required>
-    </p>
+            <div class="form-field">
+                <label>Місце</label>
+                <input type="text" name="venue" value="{{ concert.venue }}" required>
+            </div>
 
-    <p>
-        <label>Дата події:</label><br>
-        <input type="date" name="event_date" value="{{ concert.event_date }}" required>
-    </p>
+            <div class="form-field">
+                <label>Жанр</label>
+                <input type="text" name="genre" value="{{ concert.genre }}" required>
+            </div>
 
-    <p>
-        <label>URL фото:</label><br>
-        <input type="url" name="image_url" value="{{ concert.image_url }}" required>
-    </p>
+            <div class="form-field">
+                <label>Ціна</label>
+                <input type="text" name="price" value="{{ concert.price }}" required>
+            </div>
 
-    <p>
-        <label>Контакт / квитки URL:</label><br>
-        <input type="url" name="contact_url" value="{{ concert.contact_url }}" required>
-    </p>
+            <div class="form-field">
+                <label>Дата події</label>
+                <input type="date" name="event_date" value="{{ concert.event_date }}" required>
+            </div>
 
-    <p>
-        <label>Опис:</label><br>
-        <textarea name="description" minlength="20" maxlength="500" required>{{ concert.description }}</textarea>
-    </p>
+            <div class="form-field">
+                <label>URL фото</label>
+                <input type="url" name="image_url" value="{{ concert.image_url }}" required>
+            </div>
 
-    <p>
-    <p>
-    <label>Організатор:</label><br>
-    <input type="text" name="organizer" value="{{ concert.organizer }}" required>
-    </p>
+            <div class="form-field">
+                <label>Контакт / квитки URL</label>
+                <input type="url" name="contact_url" value="{{ concert.contact_url }}" required>
+            </div>
 
-    <p>
-        <label>Час початку:</label><br>
-        <input type="text" name="start_time" value="{{ concert.start_time }}" required>
-    </p>
+            <div class="form-field">
+                <label>Опис</label>
+                <textarea name="description" minlength="20" maxlength="500" required>{{ concert.description }}</textarea>
+            </div>
 
-    <p>
-        <label>Тривалість:</label><br>
-        <input type="text" name="duration" value="{{ concert.duration }}" required>
-    </p>
+            <div class="form-field">
+                <label>Організатор</label>
+                <input type="text" name="organizer" value="{{ concert.organizer }}" required>
+            </div>
 
-    <p>
-        <label>Вікове обмеження:</label><br>
-        <input type="text" name="age_limit" value="{{ concert.age_limit }}" required>
-    </p>
+            <div class="form-field">
+                <label>Час початку</label>
+                <input type="text" name="start_time" value="{{ concert.start_time }}" required>
+            </div>
 
-    <p>
-        <label>Атмосфера:</label><br>
-        <input type="text" name="mood" value="{{ concert.mood }}" required>
-    </p>
-        <label>
-            <input type="checkbox" name="is_featured" {% if concert.is_featured %}checked{% endif %}>
-            Featured
-        </label>
-    </p>
+            <div class="form-field">
+                <label>Тривалість</label>
+                <input type="text" name="duration" value="{{ concert.duration }}" required>
+            </div>
 
-    <button type="submit">Зберегти зміни</button>
-</form>
+            <div class="form-field">
+                <label>Вікове обмеження</label>
+                <input type="text" name="age_limit" value="{{ concert.age_limit }}" required>
+            </div>
 
-<p>
-    <a href="/admin">← Назад в адмінку</a>
-</p>
+            <div class="form-field">
+                <label>Атмосфера</label>
+                <input type="text" name="mood" value="{{ concert.mood }}" required>
+            </div>
+
+            <label class="checkbox-field">
+                <input type="checkbox" name="is_featured" {% if concert.is_featured %}checked{% endif %}>
+                Featured
+            </label>
+
+            <button class="admin-button" type="submit">
+                Зберегти зміни
+            </button>
+
+        </form>
+
+    </section>
+</main>
 
 </body>
 </html>
