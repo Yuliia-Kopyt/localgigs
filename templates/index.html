@@ -10,8 +10,8 @@
 
 <header class="hero">
     <nav class="navbar">
-        <div class="logo">🎶 LocalGigs</div>
-        <a class="admin-link" href="/admin/login">🔐 Адмінка</a>
+        <div class="logo">LocalGigs</div>
+        <a class="admin-link" href="/admin/login"> Адмінка</a>
     </nav>
 
     <div class="hero-content">
@@ -55,7 +55,7 @@
 
             <div class="image-wrap">
                 {% if concert.is_featured %}
-                    <span class="featured-badge">⭐ Featured</span>
+                    <span class="featured-badge"> Featured</span>
                 {% endif %}
 
                 <img src="{{ concert.image_url }}" alt="{{ concert.title }}">
@@ -70,11 +70,11 @@
                 <h3>{{ concert.title }}</h3>
 
                 <p class="meta">
-                    📍 {{ concert.city }} • {{ concert.venue }}
+                    {{ concert.city }} • {{ concert.venue }}
                 </p>
 
                 <p class="date">
-                    🗓 {{ concert.event_date }}
+                    {{ concert.event_date }}
                 </p>
 
                 <p class="description">

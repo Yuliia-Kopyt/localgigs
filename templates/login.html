@@ -11,7 +11,7 @@
 <main class="login-page">
 
     <section class="login-card">
-        <h1>🔐 Вхід в адмінку</h1>
+        <h1> Вхід в адмінку</h1>
 
         {% if error %}
             <p class="error-message">{{ error }}</p>
@@ -19,7 +19,6 @@
 
         <form method="post" action="/admin/login" class="admin-form">
 
-            <label>Пароль</label>
             <input type="password" name="password" placeholder="Введи пароль" required>
 
             <button class="primary-button" type="submit">
