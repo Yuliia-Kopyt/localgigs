@@ -8,6 +8,11 @@ app.secret_key = "localgigs-secret-key"
 
 
 def get_connection():
+    database_url = os.getenv("DATABASE_URL")
+
+    if database_url:
+        return psycopg2.connect(database_url)
+
     return psycopg2.connect(
         host="db",
         database="localgigs",
